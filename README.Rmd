@@ -23,6 +23,7 @@ For this system I use the following packages:
 library(dplyr) # A Grammar of Data Manipulation
 library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
 library(glue) # Interpreted String Literals
+library(MetBrewer) # Color Palettes Inspired by Works at the Metropolitan Museum of Art
 library(MexBrewer) # Color Palettes Inspired by Works of Mexican Muralists
 library(sf) # Simple Features for R
 ```
@@ -367,9 +368,20 @@ Plot clipped towers:
 ```{r}
 set.seed(seed)
 
-palettes <- c("Alacena", "Atentado", "Aurora", "Concha", "Frida", "Revolucion", "Ronda", "Tierra")
+# Select collection of color palettes
+edition <- sample(c("MexBrewer", "MetBrewer"), 1)
 
-col_palette <- mex.brewer(sample(palettes, 1), n = max(clipped_towers$c) + 2)
+if(edition=="MexBrewer"){
+  # Randomly select a color palette (MexBrewer Edition)
+  palette_name <- sample(c("Alacena", "Atentado", "Aurora", "Concha", "Frida", "Revolucion", "Ronda", "Tierra"), 1)
+  # col_palette <- mex.brewer(palette_name, n = 25)
+  col_palette <- mex.brewer(palette_name, n = max(clipped_towers$c))
+  
+}else{
+  # Randomly select a color palette (MetBrewer Edition)
+  palette_name <- sample(c("Austria", "Cassatt1", "Cassatt2", "Cross", "Degas", "Derain", "Egypt", "Gauguin", "Greek", "Hiroshige", "Hokusai1", "Hokusai2", "Hokusai3", "Homer1", "Homer2", "Ingres", "Isfahan1", "Isfahan2", "Juarez", "Klimt", "Lakota", "Manet", "Monet", "Moreau", "Morgenstern", "Nattier", "Navajo", "NewKingdom", "Nizami", "OKeeffe1", "OKeeffe2", "Peru1", "Peru2", "Pillement", "Pissaro", "Redon", "Renoir", "Robert", "Signac", "Stevens", "Tara", "Thomas", "Tiepolo", "Troy", "Tsimshian", "VanGogh1", "VanGogh2", 'VanGogh3', "Veronese", "Wissing"), 1)
+  col_palette <- met.brewer(palette_name, n = max(clipped_towers$c))
+}
 
 min_y <- df |> 
   filter(x == min(x)) |> 
@@ -380,7 +392,7 @@ ggplot() +
   # This is the background of the image
   geom_rect(aes(xmin = min(df$x) - 1, 
             xmax = max(df$x), 
-            ymin = min_y + tan(pi/6), 
+            ymin = min_y + tan(pi/6) + 2, 
             ymax = 30),
             fill = col_palette[length(col_palette) - 1]) + 
   # This is the probabilistic hatching
@@ -418,4 +430,5 @@ ggsave(glue("outputs/skyline-{seed}.png"),
 # Display image
 knitr::include_graphics(glue("outputs/skyline-{seed}.png"))
 ```
+
 
